@@ -1,7 +1,8 @@
 resource "github_repository_ruleset" "this" {
   for_each = var.rulesets
 
-  name = each.key
+  name       = each.key
+  repository = var.repository_name
 
   enforcement = each.value.enforcement
 
@@ -68,6 +69,9 @@ resource "github_repository_ruleset" "this" {
       }
     }
 
+    required_linear_history = each.value.rules.required_linear_history
+    required_signatures     = each.value.rules.required_signatures
+
     dynamic "required_status_checks" {
       for_each = { for idx, val in [each.value.rules.required_status_checks] : idx => val if val != null }
       content {
@@ -78,8 +82,22 @@ resource "github_repository_ruleset" "this" {
             integration_id = required_check.value.integration_id
           }
         }
+        strict_required_status_checks_policy = required_status_checks.value.strict_required_status_checks_policy
       }
     }
+
+    dynamic "tag_name_pattern" {
+      for_each = { for idx, val in [each.value.rules.tag_name_pattern] : idx => val if val != null }
+      content {
+        operator = tag_name_pattern.value.operator
+        pattern  = tag_name_pattern.value.pattern
+        name     = tag_name_pattern.value.name
+        negate   = tag_name_pattern.value.negate
+      }
+    }
+
+    update                        = each.value.rules.update
+    update_allows_fetch_and_merge = each.value.rules.update_allows_fetch_and_merge
   }
 
   target = each.value.target
@@ -102,6 +120,4 @@ resource "github_repository_ruleset" "this" {
       }
     }
   }
-
-  repository = var.repository_name
 }
