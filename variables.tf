@@ -73,7 +73,7 @@ variable "rulesets" {
       actor_id    = number
       actor_type  = string
       bypass_mode = optional(string)
-    })))
+    })), [])
     conditions = optional(object({
       ref_name = object({
         exclude = list(string)
