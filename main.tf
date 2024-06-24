@@ -103,7 +103,7 @@ resource "github_repository_ruleset" "this" {
   target = each.value.target
 
   dynamic "bypass_actors" {
-    for_each = { for idx, val in each.value.bypass_actors : idx => val if val != null }
+    for_each = { for idx, val in [each.value.bypass_actors] : idx => val if val != null }
     content {
       actor_id    = bypass_actors.value.actor_id
       actor_type  = bypass_actors.value.actor_type
